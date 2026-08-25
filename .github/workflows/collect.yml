@@ -1,0 +1,35 @@
+# Put this file at .github/workflows/collect.yml in your repo.
+# It runs the collector every 30 minutes and commits the updated database back to the repo.
+# Note: GitHub may delay scheduled runs by a few minutes under load — that's normal.
+
+name: Collect headlines
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:   # lets you trigger it manually from the Actions tab
+
+permissions:
+  contents: write
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install feedparser
+
+      - run: python collector.py
+
+      - name: Commit database
+        run: |
+          git config user.name "collector-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add headlines.db
+          git diff --cached --quiet || git commit -m "collect: $(date -u +'%Y-%m-%d %H:%M')"
+          git push
