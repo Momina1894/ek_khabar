@@ -22,7 +22,7 @@ jobs:
         with:
           python-version: "3.12"
 
-      - run: pip install feedparser
+      - run: pip install feedparser requests
 
       - run: python collector.py
 
