@@ -1,0 +1,95 @@
+# One word or phrase per line. Case-insensitive. Lines starting with # are ignored.
+# Matched as whole words, so "hike" won't match "hiker". Plurals are handled (hike/hikes).
+# Edit freely - this is the heart of Word Watch.
+
+# Intensity / alarm
+shock
+bombshell
+blow
+crisis
+catastrophe
+disaster
+chaos
+turmoil
+tragedy
+inferno
+carnage
+bloodbath
+brink
+collapse
+meltdown
+outrage
+uproar
+fury
+panic
+alarm
+horror
+
+# Conflict verbs
+slams
+blasts
+lashes out
+hits out
+snubs
+rejects
+vows
+warns
+threatens
+cracks down
+crackdown
+rebukes
+grills
+attacks
+accuses
+denounces
+condemns
+
+# Economic loading
+hike
+soars
+surges
+skyrockets
+plunges
+crashes
+tanks
+slashes
+burden
+bomb
+squeeze
+
+# Political loading
+u-turn
+regime
+mafia
+puppet
+selected
+imported
+sham
+farce
+fake news
+propaganda
+conspiracy
+plot
+coup
+draconian
+tyranny
+victimisation
+victimization
+witch hunt
+incompetent
+failure
+failed
+
+# Drama / clickbait
+sensational
+explosive
+dramatic
+stunning
+massive
+huge
+major blow
+breaking
+exposed
+revealed
+secret
+shocking

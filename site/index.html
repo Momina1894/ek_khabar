@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Today - Ek Khabar</title>
+<style>
+:root {
+  --ink: #1c1a17;
+  --ink-soft: #6b665e;
+  --paper: #fbfaf7;
+  --rule: #e4e0d8;
+  --marker: #ffe86b;
+  --link: #1b4d8c;
+}
+* { box-sizing: border-box; }
+html { font-size: 17px; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font-family: Georgia, "Times New Roman", serif; line-height: 1.5;
+}
+a { color: var(--link); text-decoration: none; }
+a:hover, a:focus-visible { text-decoration: underline; }
+mark { background: var(--marker); color: inherit; padding: 0 .15em; border-radius: .15em; }
+
+header { padding: 1.4rem 1.2rem .9rem; border-bottom: 1px solid var(--rule); }
+header .brand { font-size: 1.6rem; font-weight: 700; letter-spacing: -.01em; color: var(--ink); }
+header .brand span { color: var(--ink-soft); font-weight: 400; font-style: italic; margin-left: .6rem; font-size: 1rem; }
+nav { margin-top: .5rem; font-size: .95rem; }
+nav a { margin-right: 1.2rem; color: var(--ink-soft); }
+nav a[aria-current] { color: var(--ink); border-bottom: 2px solid var(--marker); }
+
+main { max-width: 760px; margin: 0 auto; padding: 1.6rem 1.2rem 4rem; }
+h1 { font-size: 1.9rem; line-height: 1.2; margin: 0 0 .4rem; letter-spacing: -.01em; }
+h2 { font-size: 1.25rem; margin: 2.2rem 0 .8rem; }
+.sub { color: var(--ink-soft); margin: 0 0 1.6rem; }
+
+/* index: story list */
+.story-list { list-style: none; padding: 0; margin: 0; }
+.story-list li { padding: 1rem 0; border-top: 1px solid var(--rule); }
+.story-list li:last-child { border-bottom: 1px solid var(--rule); }
+.story-list a.t { font-size: 1.2rem; color: var(--ink); display: block; line-height: 1.3; }
+.story-list .meta { color: var(--ink-soft); font-size: .9rem; margin-top: .3rem; }
+
+/* story page: headline wall */
+.wall { list-style: none; padding: 0; margin: 1rem 0 0; border-top: 1px solid var(--rule); }
+.wall li { display: grid; grid-template-columns: 8.5rem 1fr; gap: 1rem; padding: .9rem 0; border-bottom: 1px solid var(--rule); }
+.wall .who { color: var(--ink-soft); font-size: .9rem; padding-top: .15rem; }
+.wall .who small { display: block; font-size: .8rem; }
+.wall .hl { font-size: 1.15rem; line-height: 1.35; color: var(--ink); }
+.wall .hl a { color: inherit; }
+.note { margin-top: 1.6rem; color: var(--ink-soft); font-size: .9rem; }
+@media (max-width: 520px) {
+  .wall li { grid-template-columns: 1fr; gap: .2rem; }
+}
+
+/* word watch bars */
+.bars { list-style: none; padding: 0; margin: 0; }
+.bars li { display: grid; grid-template-columns: 8rem 1fr 3rem; align-items: center; gap: .8rem; padding: .35rem 0; }
+.bars .w { font-weight: 700; }
+.bars .bar { height: 1.1rem; background: var(--marker); border-radius: .15rem; }
+.bars .n { color: var(--ink-soft); text-align: right; font-size: .9rem; }
+details { margin: .2rem 0 .6rem; }
+summary { cursor: pointer; color: var(--ink-soft); font-size: .9rem; }
+details ul { margin: .4rem 0 0; padding-left: 1.2rem; font-size: .95rem; }
+.tabs { margin: 0 0 1rem; font-size: .95rem; }
+.tabs button { font: inherit; background: none; border: 1px solid var(--rule); padding: .3rem .8rem; cursor: pointer; color: var(--ink-soft); border-radius: .3rem; margin-right: .4rem; }
+.tabs button[aria-pressed="true"] { background: var(--marker); color: var(--ink); border-color: var(--marker); }
+.hidden { display: none; }
+
+/* outlets table */
+table { border-collapse: collapse; width: 100%; }
+th, td { text-align: left; padding: .6rem .4rem; border-bottom: 1px solid var(--rule); }
+th { font-weight: 400; color: var(--ink-soft); font-size: .9rem; }
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+th.num { text-align: right; }
+</style>
+</head>
+<body>
+<header>
+  <a class="brand" href="index.html">Ek Khabar<span>one event, every headline</span></a>
+  <nav><a href="index.html" aria-current="page">Today</a><a href="words.html">Word watch</a><a href="outlets.html">Outlets</a></nav>
+</header>
+<main>
+<h1>Today's stories</h1>
+<p class="sub">Stories covered by 2+ Pakistani outlets in the last two days. Updated 31 Aug 2026, 16:56 PKT.</p>
+<ul class="story-list"><li><a class="t" href="story/4.html">PIMS fire: here’s the full text of interim inquiry report</a><div class="meta">5 outlets, 10 headlines, 3 loaded words</div></li><li><a class="t" href="story/12.html">Makkah Accord: Turkiye, KSA, Pakistan to hold first meeting</a><div class="meta">4 outlets, 6 headlines</div></li><li><a class="t" href="story/34.html">At least 6 die in ferry capsize off Northern Cyprus</a><div class="meta">4 outlets, 6 headlines</div></li><li><a class="t" href="story/75.html">Pakistan, Saudi Arabia set $3bn target for agricultural, food exports</a><div class="meta">4 outlets, 5 headlines</div></li><li><a class="t" href="story/7.html">Info ministry urges foreign media to reflect &#x27;documented facts&#x27; in reporting on Imran Khan</a><div class="meta">4 outlets, 4 headlines, 2 loaded words</div></li><li><a class="t" href="story/5.html">Nepal-Tibet death toll 750 from Himalayan flood, 3,000 missing</a><div class="meta">3 outlets, 7 headlines, 2 loaded words</div></li><li><a class="t" href="story/29.html">Iceland votes &#x27;no&#x27; to resuming EU talks</a><div class="meta">3 outlets, 4 headlines</div></li><li><a class="t" href="story/10.html">Dozens of Israeli settlers attack West Bank village</a><div class="meta">3 outlets, 4 headlines, 2 loaded words</div></li><li><a class="t" href="story/18.html">DPM Dar concludes UK visit, heads to Istanbul: FO</a><div class="meta">3 outlets, 4 headlines</div></li><li><a class="t" href="story/22.html">Mojtaba urges Gulf rulers to confront ‘real enemy’</a><div class="meta">3 outlets, 4 headlines</div></li><li><a class="t" href="story/122.html">25 Pakistanis released from Indian jails repatriated via Wagah</a><div class="meta">3 outlets, 3 headlines</div></li><li><a class="t" href="story/21.html">Gul Plaza fire probe leaves blame unresolved</a><div class="meta">3 outlets, 3 headlines, 3 loaded words</div></li><li><a class="t" href="story/67.html">Reports related to Bilawal&#x27;s wedding &#x27;incorrect, unfounded&#x27;, says Murtaza Wahab</a><div class="meta">3 outlets, 3 headlines, 2 loaded words</div></li><li><a class="t" href="story/28.html">Venezuela&#x27;s interim president says US energy deal will last 25 years</a><div class="meta">3 outlets, 3 headlines</div></li><li><a class="t" href="story/48.html">Three brothers killed in IED blast in Dukki</a><div class="meta">3 outlets, 3 headlines</div></li><li><a class="t" href="story/25.html">NASA launches powerful new Roman Space Telescope from Florida</a><div class="meta">3 outlets, 3 headlines</div></li><li><a class="t" href="story/54.html">Karachi DHA scuffle: Probe underway into alleged police involvement</a><div class="meta">2 outlets, 4 headlines</div></li><li><a class="t" href="story/14.html">Rain frustrates England&#x27;s bid for Pakistan series win</a><div class="meta">2 outlets, 3 headlines</div></li><li><a class="t" href="story/17.html">Manhunt in Switzerland after rave shooting</a><div class="meta">2 outlets, 3 headlines</div></li><li><a class="t" href="story/9.html">Jamaat-e-Islami gets permission for Liaquat Bagh rally in Rawalpindi</a><div class="meta">2 outlets, 3 headlines, 2 loaded words</div></li><li><a class="t" href="story/20.html">K-P CM Afridi pledges ‘exemplary punishment’ in Ayat Noor case, renames Child Protection Bill after victim</a><div class="meta">2 outlets, 2 headlines, 1 loaded words</div></li><li><a class="t" href="story/33.html">India&#x27;s Neeraj Chopra out for season with ankle injury</a><div class="meta">2 outlets, 2 headlines</div></li><li><a class="t" href="story/42.html">At least 37 dead after Russian strike on depot near Kyiv</a><div class="meta">2 outlets, 2 headlines</div></li><li><a class="t" href="story/46.html">&#x27;False and misleading&#x27;: Govt denies cancelling 4,500MW power component of Diamer-Bhasha Dam</a><div class="meta">2 outlets, 2 headlines, 1 loaded words</div></li><li><a class="t" href="story/27.html">Pakistan makes record early repayment of Rs.1200 billion loan</a><div class="meta">2 outlets, 2 headlines</div></li><li><a class="t" href="story/1.html">Sindh&#x27;s timeless integrity</a><div class="meta">2 outlets, 2 headlines</div></li><li><a class="t" href="story/3.html">Clashes in Niger&#x27;s Niamey after troops attempt to storm presidential palace</a><div class="meta">2 outlets, 2 headlines</div></li><li><a class="t" href="story/6.html">PIMS fire inquiry committee recommends removal of 10 officers</a><div class="meta">2 outlets, 2 headlines, 1 loaded words</div></li><li><a class="t" href="story/59.html">Sindh govt, KWSC ordered to pay Rs15m over girl’s death in open manhole</a><div class="meta">2 outlets, 2 headlines</div></li><li><a class="t" href="story/50.html">OpenAI to cut off AI models for SpaceX-owned Cursor, escalating feud with Musk</a><div class="meta">2 outlets, 2 headlines</div></li><li><a class="t" href="story/39.html">Bangladesh confirms J-10 deal</a><div class="meta">2 outlets, 2 headlines</div></li><li><a class="t" href="story/60.html">Cricket Lawrence half-century propels England towards victory over Pakistan</a><div class="meta">2 outlets, 2 headlines</div></li><li><a class="t" href="story/31.html">Norway mourns King Harald as crowds gather at royal palace</a><div class="meta">2 outlets, 2 headlines</div></li><li><a class="t" href="story/47.html">Zimbabwe minibus crash kills 27</a><div class="meta">2 outlets, 2 headlines</div></li><li><a class="t" href="story/8.html">Munoz saves Iraola in Liverpool draw</a><div class="meta">2 outlets, 2 headlines</div></li><li><a class="t" href="story/43.html">AJK PM vows to restore internet, road links in days</a><div class="meta">2 outlets, 2 headlines, 2 loaded words</div></li><li><a class="t" href="story/64.html">US, Israel are enemies of all Muslims countries, says Iran’s supreme leader</a><div class="meta">2 outlets, 2 headlines</div></li><li><a class="t" href="story/23.html">4 killed, 5 injured in bus-dumper collision on Swat motorway</a><div class="meta">2 outlets, 2 headlines</div></li><li><a class="t" href="story/45.html">Political disputes must not affect Indus treaty: experts</a><div class="meta">2 outlets, 2 headlines</div></li><li><a class="t" href="story/35.html">Rybakina eases US Open injury fears</a><div class="meta">2 outlets, 2 headlines</div></li><li><a class="t" href="story/16.html">Swiatek happy with recent progress</a><div class="meta">2 outlets, 2 headlines</div></li><li><a class="t" href="story/26.html">Nazimabad private hospital maternity case raises medical questions</a><div class="meta">2 outlets, 2 headlines</div></li><li><a class="t" href="story/37.html">In meeting with Gillani, PML-N leadership stresses &#x27;immediate resolution&#x27; of AJK issues</a><div class="meta">2 outlets, 2 headlines</div></li><li><a class="t" href="story/19.html">Seven killed in armed clash over old enmity in Dadu</a><div class="meta">2 outlets, 2 headlines</div></li><li><a class="t" href="story/79.html">&#x27;They can come to Pakistan today&#x27;: Khawaja Asif disputes claim by Imran&#x27;s sons of expired Nicops</a><div class="meta">2 outlets, 2 headlines, 1 loaded words</div></li><li><a class="t" href="story/24.html">Five-wicket Abbas has Lord&#x27;s landmark as Pakistan set 389 to win second Test</a><div class="meta">2 outlets, 2 headlines</div></li><li><a class="t" href="story/38.html">Khawaja Asif Inspects Lahore airport facilities</a><div class="meta">2 outlets, 2 headlines</div></li></ul>
+</main>
+</body>
+</html>
