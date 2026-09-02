@@ -3,89 +3,308 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pakistan makes record early repayment of Rs.1200 billion loan - Ek Khabar</title>
+<title>PCB Seeks Explanation Over Rizwan, Imam’s Selection for England Tests - Ek Khabar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,300;6..72,400;6..72,500;6..72,600&family=Space+Mono:wght@400;700&display=swap">
 <style>
 :root {
-  --ink: #1c1a17;
-  --ink-soft: #6b665e;
-  --paper: #fbfaf7;
-  --rule: #e4e0d8;
+  --paper:  #f2f1ed;
+  --ink:    #12110f;
+  --soft:   #6f6c66;
+  --rule:   #cbc8c1;
   --marker: #ffe86b;
-  --link: #1b4d8c;
+
+  /* The scroll palette for story pages. */
+  --orange: #ff6d1f;
+  --blue:   #5ab0ff;
+  --lime:   #c8f02e;
+
+  --serif: "Newsreader", "Times New Roman", Times, serif;
+  --sans:  "Archivo", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --mono:  "Space Mono", "Courier New", ui-monospace, monospace;
 }
 * { box-sizing: border-box; }
-html { font-size: 17px; }
+html { -webkit-text-size-adjust: 100%; }
 body {
   margin: 0; background: var(--paper); color: var(--ink);
-  font-family: Georgia, "Times New Roman", serif; line-height: 1.5;
+  font-family: var(--serif); font-size: 17px; line-height: 1.45;
 }
-a { color: var(--link); text-decoration: none; }
-a:hover, a:focus-visible { text-decoration: underline; }
-mark { background: var(--marker); color: inherit; padding: 0 .15em; border-radius: .15em; }
+a { color: inherit; text-decoration: none; }
+mark { background: var(--marker); color: var(--ink); padding: 0 .12em; }
 
-header { padding: 1.4rem 1.2rem .9rem; border-bottom: 1px solid var(--rule); }
-header .brand { font-size: 1.6rem; font-weight: 700; letter-spacing: -.01em; color: var(--ink); }
-header .brand span { color: var(--ink-soft); font-weight: 400; font-style: italic; margin-left: .6rem; font-size: 1rem; }
-nav { margin-top: .5rem; font-size: .95rem; }
-nav a { margin-right: 1.2rem; color: var(--ink-soft); }
-nav a[aria-current] { color: var(--ink); border-bottom: 2px solid var(--marker); }
+.label { font-family: var(--mono); font-size: .62rem; letter-spacing: .13em;
+         text-transform: uppercase; color: var(--soft); }
 
-main { max-width: 760px; margin: 0 auto; padding: 1.6rem 1.2rem 4rem; }
-h1 { font-size: 1.9rem; line-height: 1.2; margin: 0 0 .4rem; letter-spacing: -.01em; }
-h2 { font-size: 1.25rem; margin: 2.2rem 0 .8rem; }
-.sub { color: var(--ink-soft); margin: 0 0 1.6rem; }
+/* ---------------------------------------------------------- masthead (index) */
+.masthead { padding: 1.5rem 1.4rem 1rem; border-bottom: 1px solid var(--ink); }
+.wordmark {
+  display: flex; align-items: center; gap: .08em; line-height: .86;
+  font-family: var(--sans); font-weight: 800; letter-spacing: -.035em;
+  font-size: clamp(2.8rem, 11vw, 7rem);
+}
+.wordmark .disc {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: .92em; height: .92em; border-radius: 50%;
+  background: var(--ink); color: var(--paper); margin: 0 .06em;
+  font-size: .82em; padding-bottom: .06em;
+}
+.wordmark .serif { font-family: var(--serif); font-weight: 400; letter-spacing: -.02em; }
+.tagline { font-family: var(--sans); font-weight: 600; font-size: .78rem;
+           line-height: 1.35; margin-top: .7rem; max-width: 30rem; }
+.tagline span { color: var(--soft); }
 
-/* index: story list */
-.story-list { list-style: none; padding: 0; margin: 0; }
-.story-list li { padding: 1rem 0; border-top: 1px solid var(--rule); }
-.story-list li:last-child { border-bottom: 1px solid var(--rule); }
-.story-list a.t { font-size: 1.2rem; color: var(--ink); display: block; line-height: 1.3; }
-.story-list .meta { color: var(--ink-soft); font-size: .9rem; margin-top: .3rem; }
+nav.top { padding: .7rem 1.4rem; border-bottom: 1px solid var(--rule);
+          display: flex; gap: 1.4rem; }
+nav.top a { font-family: var(--sans); font-weight: 600; font-size: .74rem;
+            letter-spacing: .04em; text-transform: uppercase; color: var(--soft); }
+nav.top a[aria-current] { color: var(--ink); }
+nav.top a:hover { color: var(--ink); }
 
-/* story page: headline wall */
-.wall { list-style: none; padding: 0; margin: 1rem 0 0; border-top: 1px solid var(--rule); }
-.wall li { display: grid; grid-template-columns: 8.5rem 1fr; gap: 1rem; padding: .9rem 0; border-bottom: 1px solid var(--rule); }
-.wall .who { color: var(--ink-soft); font-size: .9rem; padding-top: .15rem; }
-.wall .who small { display: block; font-size: .8rem; }
-.wall .hl { font-size: 1.15rem; line-height: 1.35; color: var(--ink); }
-.wall .hl a { color: inherit; }
-.note { margin-top: 1.6rem; color: var(--ink-soft); font-size: .9rem; }
-@media (max-width: 520px) {
-  .wall li { grid-template-columns: 1fr; gap: .2rem; }
+/* ---------------------------------------------------------- the row table */
+.rows { list-style: none; margin: 0; padding: 0; }
+.rows > li {
+  position: relative; display: grid; align-items: center;
+  grid-template-columns: 5rem minmax(0,1fr) minmax(0,15rem) 5.5rem;
+  gap: 1.2rem; padding: 1rem 1.4rem;
+  border-bottom: 1px solid var(--rule);
+  transition: background .12s linear, color .12s linear;
+}
+.rows > li:hover, .rows > li:focus-within { background: var(--ink); color: var(--paper); }
+.rows > li:hover .kicker, .rows > li:hover .count,
+.rows > li:focus-within .kicker, .rows > li:focus-within .count { color: var(--paper); }
+.rows > li:hover .chip i, .rows > li:focus-within .chip i { border-color: var(--paper); }
+.rows > li:hover mark, .rows > li:focus-within mark { background: var(--marker); color: var(--ink); }
+
+.no    { font-family: var(--sans); font-weight: 500; font-size: .72rem; letter-spacing: .06em; }
+.kicker{ font-family: var(--serif); font-size: .78rem; color: var(--soft);
+         margin-bottom: .12rem; transition: color .12s linear; }
+.title { font-family: var(--serif); font-weight: 400; font-size: 1.42rem;
+         line-height: 1.14; letter-spacing: -.012em; }
+.title a::after { content: ""; position: absolute; inset: 0; }  /* whole row clickable */
+.count { font-family: var(--sans); font-weight: 600; font-size: .72rem;
+         text-align: right; color: var(--soft); transition: color .12s linear; }
+
+/* circled-letter outlet chips */
+.chips { display: flex; flex-wrap: wrap; gap: .3rem .45rem; }
+.chip  { display: inline-flex; gap: .06em; }
+.chip i {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 1.35em; height: 1.35em; border: 1px solid currentColor; border-radius: 50%;
+  font-family: var(--sans); font-weight: 600; font-size: .56rem; font-style: normal;
+  line-height: 1; letter-spacing: 0; transition: border-color .12s linear;
+}
+.rows > li.muted { color: var(--soft); }
+.rows > li.muted:hover { background: none; color: var(--soft); }
+
+@media (max-width: 860px) {
+  .rows > li { grid-template-columns: 3.2rem minmax(0,1fr); gap: .5rem 1rem; }
+  .rows > li > .chips, .rows > li > .count { grid-column: 2; }
+  .count { text-align: left; }
+  .title { font-size: 1.2rem; }
 }
 
-/* word watch bars */
-.bars { list-style: none; padding: 0; margin: 0; }
-.bars li { display: grid; grid-template-columns: 8rem 1fr 3rem; align-items: center; gap: .8rem; padding: .35rem 0; }
-.bars .w { font-weight: 700; }
-.bars .bar { height: 1.1rem; background: var(--marker); border-radius: .15rem; }
-.bars .n { color: var(--ink-soft); text-align: right; font-size: .9rem; }
-details { margin: .2rem 0 .6rem; }
-summary { cursor: pointer; color: var(--ink-soft); font-size: .9rem; }
-details ul { margin: .4rem 0 0; padding-left: 1.2rem; font-size: .95rem; }
-.tabs { margin: 0 0 1rem; font-size: .95rem; }
-.tabs button { font: inherit; background: none; border: 1px solid var(--rule); padding: .3rem .8rem; cursor: pointer; color: var(--ink-soft); border-radius: .3rem; margin-right: .4rem; }
-.tabs button[aria-pressed="true"] { background: var(--marker); color: var(--ink); border-color: var(--marker); }
+/* ---------------------------------------------------------- plain pages */
+main.plain { padding: 2rem 1.4rem 5rem; max-width: 54rem; }
+main.plain h1 { font-family: var(--serif); font-weight: 400; font-size: 2.4rem;
+                line-height: 1.05; letter-spacing: -.02em; margin: 0 0 .5rem; }
+main.plain .sub { color: var(--soft); font-size: .95rem; margin: 0 0 2rem; max-width: 42rem; }
+.note { margin-top: 2rem; color: var(--soft); font-size: .84rem; max-width: 42rem; }
+
+.bars { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--rule); }
+.bars > li { display: grid; grid-template-columns: 9rem 1fr 3rem; align-items: center;
+             gap: .9rem; padding: .5rem 0; }
+.bars .w { font-family: var(--sans); font-weight: 700; font-size: .84rem;
+           text-transform: uppercase; letter-spacing: .02em; }
+.bars .bar { height: .85rem; background: var(--ink); }
+.bars .n { font-family: var(--mono); font-size: .78rem; text-align: right; color: var(--soft); }
+details { border-bottom: 1px solid var(--rule); padding-bottom: .5rem; }
+summary { cursor: pointer; font-family: var(--mono); font-size: .68rem;
+          letter-spacing: .04em; color: var(--soft); }
+details ul { margin: .5rem 0 0; padding-left: 1.1rem; font-size: .92rem; }
+details li { margin-bottom: .25rem; }
+details a { border-bottom: 1px solid var(--rule); }
+
+.tabs { margin: 0 0 1.2rem; display: flex; gap: .4rem; }
+.tabs button { font: 600 .72rem var(--sans); letter-spacing: .06em; text-transform: uppercase;
+               background: none; border: 1px solid var(--ink); padding: .4rem .9rem;
+               cursor: pointer; color: var(--ink); }
+.tabs button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
 .hidden { display: none; }
 
-/* outlets table */
 table { border-collapse: collapse; width: 100%; }
-th, td { text-align: left; padding: .6rem .4rem; border-bottom: 1px solid var(--rule); }
-th { font-weight: 400; color: var(--ink-soft); font-size: .9rem; }
-td.num { text-align: right; font-variant-numeric: tabular-nums; }
-th.num { text-align: right; }
+th, td { text-align: left; padding: .65rem .5rem; border-bottom: 1px solid var(--rule); }
+th { font: 600 .68rem var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--soft); }
+td { font-size: .95rem; }
+td.num, th.num { text-align: right; font-family: var(--mono); font-size: .85rem; }
+th.num { font-family: var(--sans); }
+td small { display: block; font: 400 .68rem var(--mono); color: var(--soft); letter-spacing: .04em; }
+
+/* ---------------------------------------------------------- story page */
+.doc { color: var(--ink); }
+.doc .frame { max-width: 1180px; margin: 0 auto; border-left: 1px solid var(--ink);
+              border-right: 1px solid var(--ink); }
+/* Content bands stay flat; the colour change happens inside the pull quotes,
+   so text never has to sit on the muddy middle of a gradient. */
+.band-orange { background: var(--orange); }
+.band-blue   { background: var(--blue); }
+.band-lime   { background: var(--lime); }
+.to-blue { background: linear-gradient(180deg, var(--orange) 0%, var(--blue) 100%); }
+.to-lime { background: linear-gradient(180deg, var(--blue) 0%, var(--lime) 100%); }
+
+.topbar { display: flex; align-items: center; justify-content: space-between;
+          padding: .8rem 1rem; }
+.topbar .pill { font: 400 .6rem var(--mono); letter-spacing: .16em; text-transform: uppercase;
+                border: 1px solid var(--ink); border-radius: 999px; padding: .28rem .9rem; }
+.topbar .home { font: 400 .6rem var(--mono); letter-spacing: .12em; text-transform: uppercase; }
+.topbar .home:hover { text-decoration: underline; }
+.topbar .ek { font: 800 1.05rem var(--sans); letter-spacing: -.04em;
+              border: 1px solid var(--ink); padding: .12rem .5rem; }
+
+/* the empty cell strip under the nav */
+.cells { display: grid; grid-template-columns: repeat(8, 1fr); border-top: 1px solid var(--ink); }
+.cells div { height: 2.2rem; border-right: 1px solid var(--ink); }
+.cells div:last-child { border-right: 0; }
+@media (max-width: 700px) { .cells { grid-template-columns: repeat(4, 1fr); } }
+
+/* hero: artwork slot with the title sitting over it */
+.hero { position: relative; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); }
+.art { aspect-ratio: 16 / 8.5; background: rgba(255,255,255,.16); }
+@media (max-width: 700px) { .art { aspect-ratio: 4 / 5; } }
+.hero-title {
+  position: absolute; inset: 0; margin: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; text-align: center;
+  font-family: var(--serif); font-weight: 400; letter-spacing: -.035em; line-height: .92;
+  font-size: clamp(2.1rem, 7.4vw, 5.6rem); padding: 3.6rem 1rem;
+}
+.hero-meta { position: absolute; top: 1.4rem; width: 100%; display: flex;
+             justify-content: space-between; padding: 0 1.2rem; pointer-events: none; }
+.hero-meta div { font: 400 .58rem/1.5 var(--mono); letter-spacing: .12em; text-transform: uppercase; }
+.hero-meta .r { text-align: right; }
+.hero-foot { position: absolute; bottom: 1.4rem; width: 100%; text-align: center;
+             font: 400 .58rem var(--mono); letter-spacing: .16em; text-transform: uppercase; }
+
+/* numbered sections */
+.sec { position: relative; border-bottom: 1px solid var(--ink);
+       display: grid; grid-template-columns: 6.5rem 1fr 6.5rem; }
+.sec .marker { border-right: 1px solid var(--ink); }
+.sec .marker b { display: block; width: 1.7rem; margin: .5rem 0 0 .5rem;
+                 border: 1px solid var(--ink); text-align: center;
+                 font: 400 .55rem/1.5 var(--mono); }
+.sec .tail { border-left: 1px solid var(--ink); }
+.sec .inner { padding: 2.6rem 2rem; }
+@media (max-width: 860px) {
+  .sec { grid-template-columns: 2.6rem 1fr; }
+  .sec .tail { display: none; }
+  .sec .inner { padding: 1.8rem 1.1rem; }
+}
+
+.lead { font-family: var(--serif); font-size: clamp(1.25rem, 2.5vw, 1.85rem);
+        line-height: 1.28; letter-spacing: -.015em; margin: 0; max-width: 34ch; }
+.sec p.body { font-size: 1rem; line-height: 1.6; max-width: 62ch; margin: 1.4rem 0 0; }
+
+/* the pull quote at each colour change, with its ghost behind it */
+.quote { position: relative; text-align: center; padding: 4.5rem 1.2rem; border-bottom: 1px solid var(--ink); }
+.quote q { display: block; position: relative; quotes: none;
+           font: 400 clamp(1.05rem, 3.1vw, 2.1rem)/1.32 var(--mono);
+           letter-spacing: -.02em; max-width: 22ch; margin: 0 auto; }
+.quote .ghost { position: absolute; inset: 0; display: flex; align-items: center;
+                justify-content: center; opacity: .34; transform: translateY(.42em);
+                pointer-events: none; }
+.quote .ghost span { font: 400 clamp(1.05rem, 3.1vw, 2.1rem)/1.32 var(--mono);
+                     letter-spacing: -.02em; max-width: 22ch; text-align: center; }
+.quote .who { margin-top: 1.6rem; font: 400 .58rem var(--mono);
+              letter-spacing: .16em; text-transform: uppercase; }
+/* Narrow columns wrap the quote onto enough lines that the offset ghost starts
+   interleaving with the real text, so drop it on small screens. */
+@media (max-width: 700px) { .quote .ghost { display: none; } .quote { padding: 3rem 1rem; } }
+
+/* the headline wall */
+.wall { list-style: none; margin: 0; padding: 0; }
+.wall li { display: grid; grid-template-columns: 11rem 1fr; gap: 1.4rem;
+           padding: 1.15rem 0; border-top: 1px solid rgba(18,17,15,.28); }
+.wall li:first-child { border-top: 0; }
+.wall .who { font-family: var(--mono); font-size: .6rem; line-height: 1.7;
+             letter-spacing: .1em; text-transform: uppercase; }
+.wall .who .chip { display: flex; gap: .06em; margin-bottom: .45rem; }
+.wall .who b { display: block; font-weight: 400; }
+.wall .who span { display: block; opacity: .72; }
+.wall .hl { font-family: var(--serif); font-size: 1.22rem; line-height: 1.26; letter-spacing: -.01em; }
+.wall .hl a:hover { text-decoration: underline; text-underline-offset: .18em; }
+@media (max-width: 700px) { .wall li { grid-template-columns: 1fr; gap: .4rem; } }
+
+.docfoot { display: grid; grid-template-columns: 1fr 1fr; }
+.docfoot div { padding: 1.6rem 1.2rem; font: 400 .6rem/1.7 var(--mono);
+               letter-spacing: .1em; text-transform: uppercase; }
+.docfoot div:first-child { border-right: 1px solid var(--ink); }
+.docfoot a { border-bottom: 1px solid var(--ink); }
 </style>
 </head>
-<body>
-<header>
-  <a class="brand" href="../index.html">Ek Khabar<span>one event, every headline</span></a>
-  <nav><a href="../index.html" aria-current="page">Today</a><a href="../words.html">Word watch</a><a href="../outlets.html">Outlets</a></nav>
-</header>
-<main>
-<h1>Pakistan makes record early repayment of Rs.1200 billion loan</h1>
-<p class="sub">2 outlets, 2 headlines. Highlighted words are from our loaded-language list.</p>
-<ul class="wall"><li><div class="who">Business Recorder<small>29 Aug, 16:08</small></div><div class="hl"><a href="https://www.brecorder.com/news/40436995/pakistan-retires-record-rs12tn-domestic-debt-ahead-of-maturity-khurram-schehzad" rel="noopener">Pakistan retires record Rs1.2tn domestic debt ahead of maturity: Khurram Schehzad</a></div></li><li><div class="who">ARY News<small>29 Aug, 18:47</small></div><div class="hl"><a href="https://arynews.tv/pakistan-makes-record-early-repayment-of-rs-1200-billion-loan" rel="noopener">Pakistan makes record early repayment of Rs.1200 billion loan</a></div></li></ul>
-<p class="note">Headlines link to the original articles. The story title above is simply the plainest headline in the set, not our own summary.</p>
-</main>
+<body class="story">
+<div class="doc">
+
+<div class="band-orange"><div class="frame">
+  <div class="topbar">
+    <a class="home" href="../index.html">&larr; All stories</a>
+    <span class="pill">Sports</span>
+    <span class="ek">EK</span>
+  </div>
+  <div class="cells"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+
+  <header class="hero">
+    <!-- Artwork slot: drop the Fresco piece in here as <img> or <video>, full-bleed. -->
+    <div class="art"></div>
+    <div class="hero-meta">
+      <div>Covered by<br>3 outlets</div>
+      <div class="r">Updated<br>01 Sep 2026</div>
+    </div>
+    <h1 class="hero-title">PCB Seeks Explanation Over Rizwan, Imam’s Selection for England Tests</h1>
+    <div class="hero-foot">4 headlines</div>
+  </header>
+
+  <section class="sec">
+    <div class="marker"><b>01</b></div>
+    <div class="inner">
+      <p class="lead">3 outlets ran this story. Below is every headline, word for word, in the order they filed it.</p>
+      <p class="body">The title above is not ours. It is simply the plainest headline in the
+      set &mdash; the one reaching for the fewest loaded words &mdash; standing in for the event
+      itself.</p>
+    </div>
+    <div class="tail"></div>
+  </section>
+</div></div>
+
+<div class="to-blue"><div class="frame">
+  <section class="quote">
+    <div class="ghost"><span>Seven players, including Rizwan and Imam, released after second Test defeat in England: PCB</span></div>
+    <q>Seven players, including Rizwan and Imam, released after second Test defeat in England: PCB</q>
+    <div class="who">The loudest &mdash; Dawn</div>
+  </section>
+</div></div>
+
+<div class="band-blue"><div class="frame">
+  <section class="sec">
+    <div class="marker"><b>02</b></div>
+    <div class="inner"><ul class="wall"><li><div class="who"><span class="chip" title="Dawn"><i>D</i><i>A</i><i>W</i><i>N</i></span><b>Dawn</b><span>31 Aug, 21:26</span></div><div class="hl"><a href="https://www.dawn.com/news/2026428/seven-players-including-rizwan-and-imam-released-after-second-test-defeat-in-england-pcb" rel="noopener" target="_blank">Seven players, including Rizwan and Imam, released after second Test defeat in England: PCB</a></div></li><li><div class="who"><span class="chip" title="Dawn"><i>D</i><i>A</i><i>W</i><i>N</i></span><b>Dawn</b><span>31 Aug, 22:31</span></div><div class="hl"><a href="https://www.dawn.com/news/2026428/seven-players-including-rizwan-and-imam-dropped-after-second-test-defeat-in-england-pcb" rel="noopener" target="_blank">Seven players, including Rizwan and Imam, dropped after second Test defeat in England: PCB</a></div></li><li><div class="who"><span class="chip" title="Geo"><i>G</i><i>E</i><i>O</i></span><b>Geo</b><span>01 Sep, 11:53</span></div><div class="hl"><a href="https://www.geo.tv/latest/680145-explanation-sought-over-imam-rizwans-selection-for-england-west-indies-tests" rel="noopener" target="_blank">Explanation sought over Imam, Rizwan&#x27;s selection for England, West Indies Tests</a></div></li><li><div class="who"><span class="chip" title="Pakistan Observer"><i>O</i><i>B</i><i>S</i><i>E</i><i>R</i><i>V</i><i>E</i><i>R</i></span><b>Pakistan Observer</b><span>01 Sep, 15:06</span></div><div class="hl"><a href="https://pakobserver.net/pcb-seeks-explanation-over-rizwan-imams-selection-for-england-tests/" rel="noopener" target="_blank">PCB Seeks Explanation Over Rizwan, Imam’s Selection for England Tests</a></div></li></ul></div>
+    <div class="tail"></div>
+  </section>
+</div></div>
+
+<div class="to-lime"><div class="frame">
+  <section class="quote">
+    <div class="ghost"><span>PCB Seeks Explanation Over Rizwan, Imam’s Selection for England Tests</span></div>
+    <q>PCB Seeks Explanation Over Rizwan, Imam’s Selection for England Tests</q>
+    <div class="who">The plainest &mdash; Pakistan Observer</div>
+  </section>
+</div></div>
+
+<div class="band-lime"><div class="frame">
+  <div class="docfoot">
+    <div><a href="../index.html">Ek Khabar</a><br>One event, every headline</div>
+    <div>Headlines link to the original<br>articles at each outlet</div>
+  </div>
+</div></div>
+
+</div>
 </body>
 </html>

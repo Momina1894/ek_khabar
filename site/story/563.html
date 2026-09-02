@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pakistan beat Thailand in Asia Cup opener - Ek Khabar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,300;6..72,400;6..72,500;6..72,600&family=Space+Mono:wght@400;700&display=swap">
+<style>
+:root {
+  --paper:  #f2f1ed;
+  --ink:    #12110f;
+  --soft:   #6f6c66;
+  --rule:   #cbc8c1;
+  --marker: #ffe86b;
+
+  /* The scroll palette for story pages. */
+  --orange: #ff6d1f;
+  --blue:   #5ab0ff;
+  --lime:   #c8f02e;
+
+  --serif: "Newsreader", "Times New Roman", Times, serif;
+  --sans:  "Archivo", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --mono:  "Space Mono", "Courier New", ui-monospace, monospace;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font-family: var(--serif); font-size: 17px; line-height: 1.45;
+}
+a { color: inherit; text-decoration: none; }
+mark { background: var(--marker); color: var(--ink); padding: 0 .12em; }
+
+.label { font-family: var(--mono); font-size: .62rem; letter-spacing: .13em;
+         text-transform: uppercase; color: var(--soft); }
+
+/* ---------------------------------------------------------- masthead (index) */
+.masthead { padding: 1.5rem 1.4rem 1rem; border-bottom: 1px solid var(--ink); }
+.wordmark {
+  display: flex; align-items: center; gap: .08em; line-height: .86;
+  font-family: var(--sans); font-weight: 800; letter-spacing: -.035em;
+  font-size: clamp(2.8rem, 11vw, 7rem);
+}
+.wordmark .disc {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: .92em; height: .92em; border-radius: 50%;
+  background: var(--ink); color: var(--paper); margin: 0 .06em;
+  font-size: .82em; padding-bottom: .06em;
+}
+.wordmark .serif { font-family: var(--serif); font-weight: 400; letter-spacing: -.02em; }
+.tagline { font-family: var(--sans); font-weight: 600; font-size: .78rem;
+           line-height: 1.35; margin-top: .7rem; max-width: 30rem; }
+.tagline span { color: var(--soft); }
+
+nav.top { padding: .7rem 1.4rem; border-bottom: 1px solid var(--rule);
+          display: flex; gap: 1.4rem; }
+nav.top a { font-family: var(--sans); font-weight: 600; font-size: .74rem;
+            letter-spacing: .04em; text-transform: uppercase; color: var(--soft); }
+nav.top a[aria-current] { color: var(--ink); }
+nav.top a:hover { color: var(--ink); }
+
+/* ---------------------------------------------------------- the row table */
+.rows { list-style: none; margin: 0; padding: 0; }
+.rows > li {
+  position: relative; display: grid; align-items: center;
+  grid-template-columns: 5rem minmax(0,1fr) minmax(0,15rem) 5.5rem;
+  gap: 1.2rem; padding: 1rem 1.4rem;
+  border-bottom: 1px solid var(--rule);
+  transition: background .12s linear, color .12s linear;
+}
+.rows > li:hover, .rows > li:focus-within { background: var(--ink); color: var(--paper); }
+.rows > li:hover .kicker, .rows > li:hover .count,
+.rows > li:focus-within .kicker, .rows > li:focus-within .count { color: var(--paper); }
+.rows > li:hover .chip i, .rows > li:focus-within .chip i { border-color: var(--paper); }
+.rows > li:hover mark, .rows > li:focus-within mark { background: var(--marker); color: var(--ink); }
+
+.no    { font-family: var(--sans); font-weight: 500; font-size: .72rem; letter-spacing: .06em; }
+.kicker{ font-family: var(--serif); font-size: .78rem; color: var(--soft);
+         margin-bottom: .12rem; transition: color .12s linear; }
+.title { font-family: var(--serif); font-weight: 400; font-size: 1.42rem;
+         line-height: 1.14; letter-spacing: -.012em; }
+.title a::after { content: ""; position: absolute; inset: 0; }  /* whole row clickable */
+.count { font-family: var(--sans); font-weight: 600; font-size: .72rem;
+         text-align: right; color: var(--soft); transition: color .12s linear; }
+
+/* circled-letter outlet chips */
+.chips { display: flex; flex-wrap: wrap; gap: .3rem .45rem; }
+.chip  { display: inline-flex; gap: .06em; }
+.chip i {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 1.35em; height: 1.35em; border: 1px solid currentColor; border-radius: 50%;
+  font-family: var(--sans); font-weight: 600; font-size: .56rem; font-style: normal;
+  line-height: 1; letter-spacing: 0; transition: border-color .12s linear;
+}
+.rows > li.muted { color: var(--soft); }
+.rows > li.muted:hover { background: none; color: var(--soft); }
+
+@media (max-width: 860px) {
+  .rows > li { grid-template-columns: 3.2rem minmax(0,1fr); gap: .5rem 1rem; }
+  .rows > li > .chips, .rows > li > .count { grid-column: 2; }
+  .count { text-align: left; }
+  .title { font-size: 1.2rem; }
+}
+
+/* ---------------------------------------------------------- plain pages */
+main.plain { padding: 2rem 1.4rem 5rem; max-width: 54rem; }
+main.plain h1 { font-family: var(--serif); font-weight: 400; font-size: 2.4rem;
+                line-height: 1.05; letter-spacing: -.02em; margin: 0 0 .5rem; }
+main.plain .sub { color: var(--soft); font-size: .95rem; margin: 0 0 2rem; max-width: 42rem; }
+.note { margin-top: 2rem; color: var(--soft); font-size: .84rem; max-width: 42rem; }
+
+.bars { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--rule); }
+.bars > li { display: grid; grid-template-columns: 9rem 1fr 3rem; align-items: center;
+             gap: .9rem; padding: .5rem 0; }
+.bars .w { font-family: var(--sans); font-weight: 700; font-size: .84rem;
+           text-transform: uppercase; letter-spacing: .02em; }
+.bars .bar { height: .85rem; background: var(--ink); }
+.bars .n { font-family: var(--mono); font-size: .78rem; text-align: right; color: var(--soft); }
+details { border-bottom: 1px solid var(--rule); padding-bottom: .5rem; }
+summary { cursor: pointer; font-family: var(--mono); font-size: .68rem;
+          letter-spacing: .04em; color: var(--soft); }
+details ul { margin: .5rem 0 0; padding-left: 1.1rem; font-size: .92rem; }
+details li { margin-bottom: .25rem; }
+details a { border-bottom: 1px solid var(--rule); }
+
+.tabs { margin: 0 0 1.2rem; display: flex; gap: .4rem; }
+.tabs button { font: 600 .72rem var(--sans); letter-spacing: .06em; text-transform: uppercase;
+               background: none; border: 1px solid var(--ink); padding: .4rem .9rem;
+               cursor: pointer; color: var(--ink); }
+.tabs button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.hidden { display: none; }
+
+table { border-collapse: collapse; width: 100%; }
+th, td { text-align: left; padding: .65rem .5rem; border-bottom: 1px solid var(--rule); }
+th { font: 600 .68rem var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--soft); }
+td { font-size: .95rem; }
+td.num, th.num { text-align: right; font-family: var(--mono); font-size: .85rem; }
+th.num { font-family: var(--sans); }
+td small { display: block; font: 400 .68rem var(--mono); color: var(--soft); letter-spacing: .04em; }
+
+/* ---------------------------------------------------------- story page */
+.doc { color: var(--ink); }
+.doc .frame { max-width: 1180px; margin: 0 auto; border-left: 1px solid var(--ink);
+              border-right: 1px solid var(--ink); }
+/* Content bands stay flat; the colour change happens inside the pull quotes,
+   so text never has to sit on the muddy middle of a gradient. */
+.band-orange { background: var(--orange); }
+.band-blue   { background: var(--blue); }
+.band-lime   { background: var(--lime); }
+.to-blue { background: linear-gradient(180deg, var(--orange) 0%, var(--blue) 100%); }
+.to-lime { background: linear-gradient(180deg, var(--blue) 0%, var(--lime) 100%); }
+
+.topbar { display: flex; align-items: center; justify-content: space-between;
+          padding: .8rem 1rem; }
+.topbar .pill { font: 400 .6rem var(--mono); letter-spacing: .16em; text-transform: uppercase;
+                border: 1px solid var(--ink); border-radius: 999px; padding: .28rem .9rem; }
+.topbar .home { font: 400 .6rem var(--mono); letter-spacing: .12em; text-transform: uppercase; }
+.topbar .home:hover { text-decoration: underline; }
+.topbar .ek { font: 800 1.05rem var(--sans); letter-spacing: -.04em;
+              border: 1px solid var(--ink); padding: .12rem .5rem; }
+
+/* the empty cell strip under the nav */
+.cells { display: grid; grid-template-columns: repeat(8, 1fr); border-top: 1px solid var(--ink); }
+.cells div { height: 2.2rem; border-right: 1px solid var(--ink); }
+.cells div:last-child { border-right: 0; }
+@media (max-width: 700px) { .cells { grid-template-columns: repeat(4, 1fr); } }
+
+/* hero: artwork slot with the title sitting over it */
+.hero { position: relative; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); }
+.art { aspect-ratio: 16 / 8.5; background: rgba(255,255,255,.16); }
+@media (max-width: 700px) { .art { aspect-ratio: 4 / 5; } }
+.hero-title {
+  position: absolute; inset: 0; margin: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; text-align: center;
+  font-family: var(--serif); font-weight: 400; letter-spacing: -.035em; line-height: .92;
+  font-size: clamp(2.1rem, 7.4vw, 5.6rem); padding: 3.6rem 1rem;
+}
+.hero-meta { position: absolute; top: 1.4rem; width: 100%; display: flex;
+             justify-content: space-between; padding: 0 1.2rem; pointer-events: none; }
+.hero-meta div { font: 400 .58rem/1.5 var(--mono); letter-spacing: .12em; text-transform: uppercase; }
+.hero-meta .r { text-align: right; }
+.hero-foot { position: absolute; bottom: 1.4rem; width: 100%; text-align: center;
+             font: 400 .58rem var(--mono); letter-spacing: .16em; text-transform: uppercase; }
+
+/* numbered sections */
+.sec { position: relative; border-bottom: 1px solid var(--ink);
+       display: grid; grid-template-columns: 6.5rem 1fr 6.5rem; }
+.sec .marker { border-right: 1px solid var(--ink); }
+.sec .marker b { display: block; width: 1.7rem; margin: .5rem 0 0 .5rem;
+                 border: 1px solid var(--ink); text-align: center;
+                 font: 400 .55rem/1.5 var(--mono); }
+.sec .tail { border-left: 1px solid var(--ink); }
+.sec .inner { padding: 2.6rem 2rem; }
+@media (max-width: 860px) {
+  .sec { grid-template-columns: 2.6rem 1fr; }
+  .sec .tail { display: none; }
+  .sec .inner { padding: 1.8rem 1.1rem; }
+}
+
+.lead { font-family: var(--serif); font-size: clamp(1.25rem, 2.5vw, 1.85rem);
+        line-height: 1.28; letter-spacing: -.015em; margin: 0; max-width: 34ch; }
+.sec p.body { font-size: 1rem; line-height: 1.6; max-width: 62ch; margin: 1.4rem 0 0; }
+
+/* the pull quote at each colour change, with its ghost behind it */
+.quote { position: relative; text-align: center; padding: 4.5rem 1.2rem; border-bottom: 1px solid var(--ink); }
+.quote q { display: block; position: relative; quotes: none;
+           font: 400 clamp(1.05rem, 3.1vw, 2.1rem)/1.32 var(--mono);
+           letter-spacing: -.02em; max-width: 22ch; margin: 0 auto; }
+.quote .ghost { position: absolute; inset: 0; display: flex; align-items: center;
+                justify-content: center; opacity: .34; transform: translateY(.42em);
+                pointer-events: none; }
+.quote .ghost span { font: 400 clamp(1.05rem, 3.1vw, 2.1rem)/1.32 var(--mono);
+                     letter-spacing: -.02em; max-width: 22ch; text-align: center; }
+.quote .who { margin-top: 1.6rem; font: 400 .58rem var(--mono);
+              letter-spacing: .16em; text-transform: uppercase; }
+/* Narrow columns wrap the quote onto enough lines that the offset ghost starts
+   interleaving with the real text, so drop it on small screens. */
+@media (max-width: 700px) { .quote .ghost { display: none; } .quote { padding: 3rem 1rem; } }
+
+/* the headline wall */
+.wall { list-style: none; margin: 0; padding: 0; }
+.wall li { display: grid; grid-template-columns: 11rem 1fr; gap: 1.4rem;
+           padding: 1.15rem 0; border-top: 1px solid rgba(18,17,15,.28); }
+.wall li:first-child { border-top: 0; }
+.wall .who { font-family: var(--mono); font-size: .6rem; line-height: 1.7;
+             letter-spacing: .1em; text-transform: uppercase; }
+.wall .who .chip { display: flex; gap: .06em; margin-bottom: .45rem; }
+.wall .who b { display: block; font-weight: 400; }
+.wall .who span { display: block; opacity: .72; }
+.wall .hl { font-family: var(--serif); font-size: 1.22rem; line-height: 1.26; letter-spacing: -.01em; }
+.wall .hl a:hover { text-decoration: underline; text-underline-offset: .18em; }
+@media (max-width: 700px) { .wall li { grid-template-columns: 1fr; gap: .4rem; } }
+
+.docfoot { display: grid; grid-template-columns: 1fr 1fr; }
+.docfoot div { padding: 1.6rem 1.2rem; font: 400 .6rem/1.7 var(--mono);
+               letter-spacing: .1em; text-transform: uppercase; }
+.docfoot div:first-child { border-right: 1px solid var(--ink); }
+.docfoot a { border-bottom: 1px solid var(--ink); }
+</style>
+</head>
+<body class="story">
+<div class="doc">
+
+<div class="band-orange"><div class="frame">
+  <div class="topbar">
+    <a class="home" href="../index.html">&larr; All stories</a>
+    <span class="pill">Sports</span>
+    <span class="ek">EK</span>
+  </div>
+  <div class="cells"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+
+  <header class="hero">
+    <!-- Artwork slot: drop the Fresco piece in here as <img> or <video>, full-bleed. -->
+    <div class="art"></div>
+    <div class="hero-meta">
+      <div>Covered by<br>4 outlets</div>
+      <div class="r">Updated<br>02 Sep 2026</div>
+    </div>
+    <h1 class="hero-title">Pakistan beat Thailand in Asia Cup opener</h1>
+    <div class="hero-foot">4 headlines</div>
+  </header>
+
+  <section class="sec">
+    <div class="marker"><b>01</b></div>
+    <div class="inner">
+      <p class="lead">4 outlets ran this story. Below is every headline, word for word, in the order they filed it.</p>
+      <p class="body">The title above is not ours. It is simply the plainest headline in the
+      set &mdash; the one reaching for the fewest loaded words &mdash; standing in for the event
+      itself.</p>
+    </div>
+    <div class="tail"></div>
+  </section>
+</div></div>
+
+<div class="to-blue"><div class="frame">
+  <section class="quote">
+    <div class="ghost"><span>Pakistan beat Thailanad in low-scoring Women&#x27;s T20 Asia Cup encounter</span></div>
+    <q>Pakistan beat Thailanad in low-scoring Women&#x27;s T20 Asia Cup encounter</q>
+    <div class="who">The loudest &mdash; Geo</div>
+  </section>
+</div></div>
+
+<div class="band-blue"><div class="frame">
+  <section class="sec">
+    <div class="marker"><b>02</b></div>
+    <div class="inner"><ul class="wall"><li><div class="who"><span class="chip" title="Geo"><i>G</i><i>E</i><i>O</i></span><b>Geo</b><span>01 Sep, 17:42</span></div><div class="hl"><a href="https://www.geo.tv/latest/680206-pakistan-beat-thailanad-in-low-scoring-womens-t20-asia-cup-encounter" rel="noopener" target="_blank">Pakistan beat Thailanad in low-scoring Women&#x27;s T20 Asia Cup encounter</a></div></li><li><div class="who"><span class="chip" title="Express Tribune"><i>T</i><i>R</i><i>I</i><i>B</i><i>U</i><i>N</i><i>E</i></span><b>Express Tribune</b><span>02 Sep, 00:50</span></div><div class="hl"><a href="https://tribune.com.pk/story/2627043/pakistan-beat-thailand-in-asia-cup-opener" rel="noopener" target="_blank">Pakistan beat Thailand in Asia Cup opener</a></div></li><li><div class="who"><span class="chip" title="Minute Mirror"><i>M</i><i>I</i><i>R</i><i>R</i><i>O</i><i>R</i></span><b>Minute Mirror</b><span>02 Sep, 07:11</span></div><div class="hl"><a href="https://minutemirror.com.pk/pakistan-women-beat-thailand-by-35-runs-in-asia-cup-opener-623047/" rel="noopener" target="_blank">Pakistan Women beat Thailand by 35 runs in Asia Cup Opener</a></div></li><li><div class="who"><span class="chip" title="Daily Times"><i>T</i><i>I</i><i>M</i><i>E</i><i>S</i></span><b>Daily Times</b><span>02 Sep, 14:06</span></div><div class="hl"><a href="https://dailytimes.com.pk/1547112/pakistan-beat-thailand-in-asia-cup-opener/" rel="noopener" target="_blank">Pakistan beat Thailand in Asia Cup opener</a></div></li></ul></div>
+    <div class="tail"></div>
+  </section>
+</div></div>
+
+<div class="to-lime"><div class="frame">
+  <section class="quote">
+    <div class="ghost"><span>Pakistan beat Thailand in Asia Cup opener</span></div>
+    <q>Pakistan beat Thailand in Asia Cup opener</q>
+    <div class="who">The plainest &mdash; Express Tribune</div>
+  </section>
+</div></div>
+
+<div class="band-lime"><div class="frame">
+  <div class="docfoot">
+    <div><a href="../index.html">Ek Khabar</a><br>One event, every headline</div>
+    <div>Headlines link to the original<br>articles at each outlet</div>
+  </div>
+</div></div>
+
+</div>
+</body>
+</html>
