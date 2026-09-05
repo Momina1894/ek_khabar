@@ -13,9 +13,11 @@ Usage:
     python collector.py           # fetch once and save
     python collector.py --stats   # show what's in the database
     python collector.py --feeds   # check every feed is alive
+    python collector.py --fix-titles  # recover headlines a feed clipped
 """
 
 import html
+import re
 import sqlite3
 import sys
 import time
@@ -155,6 +157,61 @@ def entry_section(entry, fallback):
     return fallback
 
 
+# ---------------------------------------------------------------- clipped titles
+
+# Minute Mirror's feed caps <title> at ~50 characters, so every one of its
+# headlines arrives clipped. A clipped headline is not that outlet's wording, and
+# rebuilding one from the URL slug would invent its capitalisation and
+# punctuation - on a site about exact wording that is worse than leaving it. The
+# article page's og:title carries the real headline, so fetch that instead.
+TRUNCATED_RE = re.compile(r"(\.\.\.|…)\s*$")
+OG_TITLE_RE = re.compile(
+    r"""<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)""", re.I)
+
+MAX_TITLE_REPAIRS = 40  # per run, so a backlog never stalls the collector
+
+
+def looks_truncated(title):
+    return bool(TRUNCATED_RE.search(title or ""))
+
+
+def fetch_full_title(url):
+    """The real headline from the article page, or None if it cannot be read."""
+    try:
+        resp = requests.get(url, headers={"User-Agent": USER_AGENT}, timeout=20)
+        resp.raise_for_status()
+        m = OG_TITLE_RE.search(resp.text)
+        if m:
+            full = html.unescape(m.group(1)).strip()
+            if full and not looks_truncated(full):
+                return full
+    except Exception:
+        pass
+    return None
+
+
+def repair_titles(conn, limit=MAX_TITLE_REPAIRS):
+    """Replace clipped headlines with the outlet's real one. Returns how many."""
+    # Ordered randomly on purpose. A few of these articles serve a permanently
+    # broken empty page, and taking them in id order let the same unfixable rows
+    # sit at the front of the queue and block every later one.
+    rows = conn.execute(
+        "SELECT id, url, title FROM headlines "
+        "WHERE title LIKE '%...' OR title LIKE '%…' "
+        "ORDER BY RANDOM() LIMIT ?", (limit,)
+    ).fetchall()
+    fixed = 0
+    for hid, url, title in rows:
+        full = fetch_full_title(url)
+        if full and full != title:
+            conn.execute("UPDATE headlines SET title = ? WHERE id = ?", (full, hid))
+            fixed += 1
+        time.sleep(2)  # be polite, these are article pages not feeds
+    if fixed:
+        conn.commit()
+    return fixed, len(rows)
+
+
 # ---------------------------------------------------------------- db
 
 def init_db(conn):
@@ -253,6 +310,11 @@ def fetch_all(conn):
     print(f"\nDone. {total_new} new headlines saved.")
     if backfilled:
         print(f"Back-filled sections on {backfilled} older headlines.")
+
+    # Feeds that clip their headlines leave the real wording on the article page.
+    fixed, seen = repair_titles(conn)
+    if seen:
+        print(f"Recovered {fixed} of {seen} clipped headlines from their article pages.")
     for outlet in sorted(per_outlet, key=lambda o: -per_outlet[o]):
         print(f"  {outlet:<18} {per_outlet[outlet]:>3}")
 
@@ -306,6 +368,23 @@ if __name__ == "__main__":
         init_db(conn)
         if "--stats" in sys.argv:
             show_stats(conn)
+        elif "--fix-titles" in sys.argv:
+            # Backfill: work through every clipped headline already stored.
+            total = 0
+            stalled = 0
+            while True:
+                fixed, seen = repair_titles(conn, limit=25)
+                total += fixed
+                print(f"  recovered {fixed} of {seen} tried", flush=True)
+                if seen == 0:
+                    break
+                # Some articles are permanently broken upstream. Give the random
+                # draw a few rounds to find fixable rows before calling it done.
+                stalled = stalled + 1 if fixed == 0 else 0
+                if stalled >= 3:
+                    print("  no further progress - the rest look unrecoverable")
+                    break
+            print(f"Recovered {total} clipped headlines.")
         else:
             fetch_all(conn)
         conn.close()

@@ -5,8 +5,8 @@ Reads headlines.db and writes a static website into ./site/
 Pages:
   site/index.html        the cover: today's stories, most-covered first
   site/story/<id>.html   one story: every outlet's headline, loaded words highlighted
-  site/words.html        Word Watch: most used loaded words, this week / this month
-  site/outlets.html      outlets compared by how often they use loaded words
+
+Word Watch and Outlets are sections of the cover, not pages of their own.
 
 Usage:
     python build.py
@@ -120,6 +120,14 @@ def utc_now():
     return datetime.now(timezone.utc)
 
 
+CLIPPED_RE = re.compile(r"(\.\.\.|…)\s*$")
+
+
+def looks_clipped(title):
+    """True when a feed cut the headline short rather than the outlet writing it."""
+    return bool(CLIPPED_RE.search(title or ""))
+
+
 def load_stories(conn, days=INDEX_DAYS):
     rows = conn.execute("""
         SELECT s.story_id, h.id, h.outlet, h.title, h.url, h.section,
@@ -143,8 +151,12 @@ def load_stories(conn, days=INDEX_DAYS):
         last_ts = items[-1]["ts"]
         if last_ts < cutoff:
             continue
-        # The "plainest" headline stands in as the story title: fewest loaded words, then shortest.
-        plain = min(items, key=lambda i: (len(find_loaded(i["title"])), len(i["title"])))
+        # The "plainest" headline stands in as the story title: fewest loaded words,
+        # then shortest. A headline the feed clipped is ruled out first - it is not
+        # the outlet's wording, so it must never speak for the story. The collector
+        # recovers most of these, but a fetch can fail.
+        plain = min(items, key=lambda i: (looks_clipped(i["title"]),
+                                          len(find_loaded(i["title"])), len(i["title"])))
         # The opposite end: whoever reached for the most loaded language.
         loudest = max(items, key=lambda i: (len(find_loaded(i["title"])), len(i["title"])))
         desks = Counter(i["section"] for i in items if i["section"])
@@ -217,15 +229,41 @@ FONTS = ("https://fonts.googleapis.com/css2?"
 CSS = """
 :root {
   --paper:  #f2f1ed;
+  --blue:   #6f8dff;   /* the cover opens on this, then fades to paper */
   --ink:    #12110f;
   --soft:   #6f6c66;
   --rule:   #cbc8c1;
   --marker: #ffe86b;
+  --hair:   var(--hair);   /* hairlines drawn over a colour band */
+  /* Text that sits on a bright fixed colour - the marker, a hovered row. These
+     backgrounds do not change between themes, so this must not either. */
+  --on-accent: #12110f;
 
   --serif: "Newsreader", "Times New Roman", Times, serif;
   --sans:  "Archivo", "Helvetica Neue", Helvetica, Arial, sans-serif;
   --mono:  "Space Mono", "Courier New", ui-monospace, monospace;
 }
+/* Dark theme. The system preference decides until the reader picks one with the
+   corner button, which then wins and is remembered. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper:  #131210;
+    --blue:   #27346f;
+    --ink:    #eeece5;
+    --soft:   #8f8b82;
+    --rule:   #33312c;
+    --hair:   rgba(238,236,229,.22);
+  }
+}
+:root[data-theme="dark"] {
+  --paper:  #131210;
+  --blue:   #27346f;
+  --ink:    #eeece5;
+  --soft:   #8f8b82;
+  --rule:   #33312c;
+  --hair:   rgba(238,236,229,.22);
+}
+
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
 /* Anyone who has asked their system not to animate should not be dragged down
@@ -237,7 +275,7 @@ body {
   font-family: var(--serif); font-size: 17px; line-height: 1.45;
 }
 a { color: inherit; text-decoration: none; }
-mark { background: var(--marker); color: var(--ink); padding: 0 .12em; }
+mark { background: var(--marker); color: var(--on-accent); padding: 0 .12em; }
 
 /* ============================================================ THE COVER
    Full-bleed colour bands with the gradient living inside the pull quotes,
@@ -245,17 +283,13 @@ mark { background: var(--marker); color: var(--ink); padding: 0 .12em; }
 .cover { color: var(--ink); }
 .frame { max-width: 1180px; margin: 0 auto;
          border-left: 1px solid var(--ink); border-right: 1px solid var(--ink); }
-.band-1 { background: var(--c1); }
-.band-2 { background: var(--c2); }
-.band-3 { background: var(--c3); }
-.band-4 { background: var(--c4); }
+.band-blue  { background: var(--blue); }
+.band-paper { background: var(--paper); }
 /* The colour change is the whole event now - no text rides on top of it. Bounded
    rather than pure vh: three of these at 34vh each is most of a screen given over
    to empty gradient on a tall monitor. */
-.fade { height: clamp(170px, 22vh, 290px); border-bottom: 1px solid var(--ink); }
-.fade-1 { background: linear-gradient(180deg, var(--c1) 0%, var(--c2) 100%); }
-.fade-2 { background: linear-gradient(180deg, var(--c2) 0%, var(--c3) 100%); }
-.fade-3 { background: linear-gradient(180deg, var(--c3) 0%, var(--c4) 100%); }
+.fade { height: clamp(200px, 26vh, 340px); border-bottom: 1px solid var(--ink);
+        background: linear-gradient(180deg, var(--blue) 0%, var(--paper) 100%); }
 
 .topbar { display: flex; align-items: center; justify-content: space-between;
           gap: 1rem; padding: .8rem 1rem; }
@@ -266,6 +300,13 @@ mark { background: var(--marker); color: var(--ink); padding: 0 .12em; }
 .topbar .pill { border: 1px solid var(--ink); border-radius: 999px; padding: .28rem .9rem; }
 .topbar .ek { font-family: var(--sans); font-weight: 800; font-size: 1.05rem;
               letter-spacing: -.04em; border: 1px solid var(--ink); padding: .12rem .5rem; }
+.topbar .right { display: flex; align-items: center; gap: .5rem; }
+.themetoggle { font-family: var(--mono); font-size: .72rem; line-height: 1;
+               background: none; color: inherit; border: 1px solid var(--ink);
+               border-radius: 999px; width: 1.85rem; height: 1.85rem; cursor: pointer;
+               display: inline-flex; align-items: center; justify-content: center;
+               padding: 0; transition: background .12s linear, color .12s linear; }
+.themetoggle:hover, .themetoggle:focus-visible { background: var(--ink); color: var(--paper); }
 
 .cells { display: grid; grid-template-columns: repeat(8, 1fr); border-top: 1px solid var(--ink); }
 .cells div { height: 2.2rem; border-right: 1px solid var(--ink); }
@@ -308,19 +349,19 @@ mark { background: var(--marker); color: var(--ink); padding: 0 .12em; }
 
 /* word watch and outlets, sitting on a colour band rather than white paper */
 .cover .bars { list-style: none; padding: 0; margin: 0;
-               border-top: 1px solid rgba(18,17,15,.28); }
+               border-top: 1px solid var(--hair); }
 .cover .bars > li { display: grid; grid-template-columns: 9rem 1fr 3rem;
                     align-items: center; gap: .9rem; padding: .5rem 0; }
 .cover .bars .w { font-family: var(--sans); font-weight: 700; font-size: .82rem;
                   text-transform: uppercase; letter-spacing: .02em; }
 .cover .bars .bar { height: .8rem; background: var(--ink); }
 .cover .bars .n { font-family: var(--mono); font-size: .74rem; text-align: right; }
-.cover details { border-bottom: 1px solid rgba(18,17,15,.28); padding-bottom: .5rem; }
+.cover details { border-bottom: 1px solid var(--hair); padding-bottom: .5rem; }
 .cover summary { cursor: pointer; font-family: var(--mono); font-size: .62rem;
                  letter-spacing: .06em; opacity: .78; }
 .cover details ul { margin: .5rem 0 0; padding-left: 1.1rem; font-size: .92rem; }
 .cover details li { margin-bottom: .25rem; }
-.cover details a { border-bottom: 1px solid rgba(18,17,15,.4); }
+.cover details a { border-bottom: 1px solid var(--hair); }
 .cover .tabs { margin: 0 0 1.2rem; display: flex; gap: .4rem; }
 .cover .tabs button { font-family: var(--sans); font-weight: 600; font-size: .68rem;
                       letter-spacing: .06em; text-transform: uppercase; background: none;
@@ -329,7 +370,7 @@ mark { background: var(--marker); color: var(--ink); padding: 0 .12em; }
 .cover .tabs button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
 .cover table { border-collapse: collapse; width: 100%; }
 .cover th, .cover td { text-align: left; padding: .6rem .5rem;
-                       border-bottom: 1px solid rgba(18,17,15,.28); }
+                       border-bottom: 1px solid var(--hair); }
 .cover th { font-family: var(--sans); font-weight: 600; font-size: .64rem;
             letter-spacing: .08em; text-transform: uppercase; opacity: .75; }
 .cover td { font-size: .94rem; }
@@ -342,7 +383,7 @@ mark { background: var(--marker); color: var(--ink); padding: 0 .12em; }
 
 /* the cover's story list */
 .cover-list { list-style: none; margin: 0; padding: 0; }
-.cover-list li { position: relative; border-top: 1px solid rgba(18,17,15,.3);
+.cover-list li { position: relative; border-top: 1px solid var(--hair);
                  display: grid; grid-template-columns: 4.2rem 1fr 7.5rem;
                  gap: 1.2rem; align-items: baseline; padding: .95rem .4rem;
                  transition: background .12s linear, color .12s linear; }
@@ -371,26 +412,9 @@ mark { background: var(--marker); color: var(--ink); padding: 0 .12em; }
 .docfoot a { border-bottom: 1px solid var(--ink); }
 
 /* ============================================================ INNER PAGES */
-.masthead { padding: 1.5rem 1.4rem 1rem; border-bottom: 1px solid var(--ink); }
-.wordmark { display: flex; align-items: center; gap: .08em; line-height: .86;
-  font-family: var(--sans); font-weight: 800; letter-spacing: -.035em;
-  font-size: clamp(2.4rem, 8vw, 4.6rem); }
-.wordmark .disc { display: inline-flex; align-items: center; justify-content: center;
-  width: .92em; height: .92em; border-radius: 50%; background: var(--ink); color: var(--paper);
-  margin: 0 .06em; font-size: .82em; padding-bottom: .06em; }
-.wordmark .serif { font-family: var(--serif); font-weight: 400; letter-spacing: -.02em; }
-.tagline { font-family: var(--sans); font-weight: 600; font-size: .78rem; line-height: 1.35;
-           margin-top: .7rem; max-width: 30rem; }
-.tagline span { color: var(--soft); }
-nav.top { padding: .7rem 1.4rem; border-bottom: 1px solid var(--rule); display: flex; gap: 1.4rem; }
-nav.top a { font-family: var(--sans); font-weight: 600; font-size: .74rem;
-            letter-spacing: .04em; text-transform: uppercase; color: var(--soft); }
-nav.top a[aria-current], nav.top a:hover { color: var(--ink); }
 
 /* story head */
 .storyhead { padding: 2.2rem 1.4rem 1.4rem; border-bottom: 1px solid var(--ink); }
-.storyhead .eyebrow { font-family: var(--mono); font-size: .58rem; letter-spacing: .16em;
-                      text-transform: uppercase; color: var(--soft); }
 .storyhead h1 { font-family: var(--serif); font-weight: 400; margin: .5rem 0 0;
                 font-size: clamp(1.9rem, 5vw, 3.4rem); line-height: 1.03;
                 letter-spacing: -.025em; max-width: 22ch; }
@@ -404,11 +428,13 @@ nav.top a[aria-current], nav.top a:hover { color: var(--ink); }
   padding: 1rem 1.4rem; border-bottom: 1px solid var(--rule);
   transition: background .12s linear; }
 /* Each row carries its own --hov, one of the cover's colours for the day. */
-.rows > li:hover, .rows > li:focus-within { background: var(--hov); }
+/* A hovered row is a bright fixed colour in either theme, so its text is pinned
+   dark rather than following --ink. */
+.rows > li:hover, .rows > li:focus-within { background: var(--hov); color: var(--on-accent); }
 .rows > li:hover .kicker, .rows > li:hover .count,
-.rows > li:focus-within .kicker, .rows > li:focus-within .count { color: var(--ink); }
+.rows > li:focus-within .kicker, .rows > li:focus-within .count { color: var(--on-accent); }
 .rows > li:hover mark, .rows > li:focus-within mark {
-  background: var(--ink); color: var(--hov); }
+  background: var(--on-accent); color: var(--hov); }
 .no     { font-family: var(--mono); font-size: .58rem; letter-spacing: .1em; }
 .kicker { font-family: var(--mono); font-size: .55rem; letter-spacing: .14em;
           text-transform: uppercase; color: var(--soft); margin-bottom: .25rem;
@@ -444,6 +470,35 @@ def document(title, body):
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="{FONTS}">
 <style>{CSS}</style>
+<script>
+// Applied before first paint so a reader who chose dark never sees a light flash.
+(function () {{
+  try {{
+    var t = localStorage.getItem("ek-theme");
+    if (t) document.documentElement.setAttribute("data-theme", t);
+  }} catch (e) {{}}
+}})();
+function ekTheme() {{
+  var root = document.documentElement;
+  var now = root.getAttribute("data-theme") ||
+    (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  var next = now === "dark" ? "light" : "dark";
+  root.setAttribute("data-theme", next);
+  try {{ localStorage.setItem("ek-theme", next); }} catch (e) {{}}
+  ekLabelTheme();
+}}
+function ekLabelTheme() {{
+  var root = document.documentElement;
+  var dark = (root.getAttribute("data-theme") ||
+    (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")) === "dark";
+  document.querySelectorAll(".themetoggle").forEach(function (b) {{
+    b.textContent = dark ? "◑" : "◐";
+    b.setAttribute("aria-label", dark ? "Switch to light mode" : "Switch to dark mode");
+    b.setAttribute("title", dark ? "Switch to light mode" : "Switch to dark mode");
+  }});
+}}
+document.addEventListener("DOMContentLoaded", ekLabelTheme);
+</script>
 </head>
 <body>
 {body}
@@ -451,26 +506,6 @@ def document(title, body):
 </html>"""
 
 
-def masthead(current, depth=0):
-    # Word watch and Outlets are sections of the cover now, not pages of their
-    # own, so these are anchors. Arriving from a story page jumps straight to
-    # them; on the cover itself the browser scrolls smoothly.
-    root = "../" * depth
-    items = [("index.html", "Today", "today"),
-             ("index.html#words", "Word watch", "words"),
-             ("index.html#outlets", "Outlets", "outlets")]
-    nav = "".join(
-        f'<a href="{root}{href}"{" aria-current=\"page\"" if key == current else ""}>{label}</a>'
-        for href, label, key in items
-    )
-    return f"""<header class="masthead">
-  <a class="wordmark" href="{root}index.html" aria-label="{SITE_NAME}">
-    <span>E</span><span class="disc">k</span><span class="serif">KHABAR</span>
-  </a>
-  <p class="tagline">One event, every headline.<br>
-  <span>Pakistani outlets side by side, so you can see the wording change.</span></p>
-</header>
-<nav class="top">{nav}</nav>"""
 
 
 def fmt_time(ts):
@@ -514,8 +549,7 @@ def cover_rows(stories, start=1):
     return "".join(out)
 
 
-def build_index(conn, stories, built_at, colours):
-    c1, c2, c3, c4 = colours
+def build_index(conn, stories, built_at):
 
     empty = ('<li class="ct-empty">No story has been picked up by two outlets yet. '
              'Check back after a few collection runs.</li>')
@@ -530,13 +564,13 @@ def build_index(conn, stories, built_at, colours):
         for s in outlet_stats(load_headlines_since(conn, 30))
     )
 
-    body = f"""<div class="cover" style="--c1:{c1};--c2:{c2};--c3:{c3};--c4:{c4}">
+    body = f"""<div class="cover">
 
-<div class="band-1"><div class="frame">
+<div class="band-blue"><div class="frame">
   <div class="topbar">
     <nav><a href="#words">Word watch</a><a href="#outlets">Outlets</a></nav>
     <span class="pill">Today</span>
-    <span class="ek">EK</span>
+    <span class="right"><button class="themetoggle" type="button" onclick="ekTheme()" aria-label="Switch to dark mode" title="Switch to dark mode">&#9680;</button><span class="ek">EK</span></span>
   </div>
   <div class="cells"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
 
@@ -564,9 +598,9 @@ def build_index(conn, stories, built_at, colours):
   </section>
 </div></div>
 
-<div class="fade fade-1"></div>
+<div class="fade"></div>
 
-<div class="band-2"><div class="frame">
+<div class="band-paper"><div class="frame">
   <section class="sec" id="stories">
     <div class="marker"><b>02</b></div>
     <div class="inner">
@@ -575,11 +609,7 @@ def build_index(conn, stories, built_at, colours):
     </div>
     <div class="tail"></div>
   </section>
-</div></div>
 
-<div class="fade fade-2"></div>
-
-<div class="band-3"><div class="frame">
   <section class="sec" id="words">
     <div class="marker"><b>03</b></div>
     <div class="inner">
@@ -597,11 +627,7 @@ def build_index(conn, stories, built_at, colours):
     </div>
     <div class="tail"></div>
   </section>
-</div></div>
 
-<div class="fade fade-3"></div>
-
-<div class="band-4"><div class="frame">
   <section class="sec" id="outlets">
     <div class="marker"><b>04</b></div>
     <div class="inner">
@@ -662,17 +688,24 @@ def build_story(s, colours):
     if s["loaded_count"]:
         loaded = f' &middot; {plural(s["loaded_count"], "loaded word")} marked'
 
-    body = f"""{masthead("today", depth=1)}
-<header class="storyhead">
-  <div class="eyebrow">{html.escape(s["section"] or "Story")}</div>
-  <h1>{html.escape(s["title"])}</h1>
-  <div class="facts">{plural(s["outlets"], "outlet")} &middot;
-  {plural(len(s["items"]), "headline")}{loaded} &middot; updated {fmt_date(s["last_ts"])}</div>
-</header>
-<ul class="rows">{''.join(rows)}</ul>
-<p class="backline">Every headline links to the original article at that outlet. The story
-title above is the plainest version in the set, not our own summary. &nbsp;
-<a href="../index.html">Back to today</a></p>"""
+    body = f"""<div class="band-paper"><div class="frame">
+  <div class="topbar">
+    <a class="home" href="../index.html">&larr; All stories</a>
+    <span class="pill">{html.escape(s["section"] or "Story")}</span>
+    <span class="right"><button class="themetoggle" type="button" onclick="ekTheme()" aria-label="Switch to dark mode" title="Switch to dark mode">&#9680;</button><span class="ek">EK</span></span>
+  </div>
+  <div class="cells"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+
+  <header class="storyhead">
+    <h1>{html.escape(s["title"])}</h1>
+    <div class="facts">{plural(s["outlets"], "outlet")} &middot;
+    {plural(len(s["items"]), "headline")}{loaded} &middot; updated {fmt_date(s["last_ts"])}</div>
+  </header>
+  <ul class="rows">{''.join(rows)}</ul>
+  <p class="backline">Every headline links to the original article at that outlet. The story
+  title above is the plainest version in the set, not our own summary. &nbsp;
+  <a href="../index.html">&larr; Back to today</a></p>
+</div></div>"""
     return document(s["title"], body)
 
 
@@ -721,7 +754,7 @@ def main():
 
     if os.path.exists(OUT_DIR):
         shutil.rmtree(OUT_DIR)
-    write(f"{OUT_DIR}/index.html", build_index(conn, stories, built_at, colours))
+    write(f"{OUT_DIR}/index.html", build_index(conn, stories, built_at))
     for s in stories:
         write(f"{OUT_DIR}/story/{s['id']}.html", build_story(s, colours))
     write(f"{OUT_DIR}/.nojekyll", "")
