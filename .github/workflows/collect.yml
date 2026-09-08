@@ -1,5 +1,14 @@
-# Replaces .github/workflows/collect.yml
-# Every 30 min: collect -> cluster -> build site -> commit db -> publish site/ to GitHub Pages
+# Every 30 min: collect -> cluster -> build site -> publish site/ to GitHub Pages.
+#
+# The database is NOT committed to git. It used to be, and at ~48 commits a day of
+# a growing binary the repo history was the fastest-growing thing in the project.
+# It now lives as an asset on the "data" release: restored at the start of a run,
+# saved again at the end, with a dated snapshot kept once a day so a bad run can
+# be rolled back.
+#
+# Working on this locally? Either run `python collector.py` a few times to build
+# your own, or grab the current one:
+#   gh release download data --pattern headlines.db
 
 name: Collect headlines
 
@@ -13,9 +22,13 @@ permissions:
   pages: write
   id-token: write
 
+# Runs queue rather than overlap, so two of them never write the database at once.
 concurrency:
-  group: pages
+  group: collect
   cancel-in-progress: false
+
+env:
+  GH_TOKEN: ${{ github.token }}
 
 jobs:
   collect:
@@ -35,17 +48,40 @@ jobs:
 
       - run: pip install feedparser requests scikit-learn sentence-transformers
 
+      - name: Run tests
+        run: python -m unittest discover -v
+
+      - name: Restore database
+        run: |
+          if gh release download data --pattern headlines.db --clobber 2>/dev/null; then
+            echo "restored $(du -h headlines.db | cut -f1) database"
+          else
+            echo "no database on the data release yet - starting a fresh one"
+          fi
+
       - run: python collector.py
       - run: python cluster.py
       - run: python build.py
 
-      - name: Commit database
+      - name: Save database
         run: |
-          git config user.name "collector-bot"
-          git config user.email "bot@users.noreply.github.com"
-          git add headlines.db
-          git diff --cached --quiet || git commit -m "collect: $(date -u +'%Y-%m-%d %H:%M')"
-          git push
+          gh release view data >/dev/null 2>&1 || \
+            gh release create data --title "Data" \
+              --notes "Rolling headline database. headlines.db is current; dated files are daily snapshots."
+          gh release upload data headlines.db --clobber
+
+          # One snapshot a day, so a run that corrupts the database can be undone.
+          snap="headlines-$(date -u +'%Y-%m-%d').db"
+          if ! gh release view data --json assets --jq '.assets[].name' | grep -qx "$snap"; then
+            cp headlines.db "$snap"
+            gh release upload data "$snap" --clobber
+            echo "snapshot $snap"
+          fi
+
+          # Keep the last 14 snapshots.
+          gh release view data --json assets --jq '.assets[].name' \
+            | grep -E '^headlines-[0-9]{4}-[0-9]{2}-[0-9]{2}\.db$' | sort -r | tail -n +15 \
+            | while read -r old; do gh release delete-asset data "$old" -y && echo "pruned $old"; done
 
       - uses: actions/upload-pages-artifact@v3
         with:

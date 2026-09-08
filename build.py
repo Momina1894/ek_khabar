@@ -27,7 +27,23 @@ OUT_DIR = "site"
 SITE_NAME = "Ek Khabar"
 MIN_OUTLETS = 2   # a story needs this many outlets to be shown
 INDEX_DAYS = 2    # a story is "current" if any outlet ran it within this many days
+# How far back a story's own headlines may reach. Story ids are stable and carry
+# forward, which is right for a developing story but wrong for a recurring one:
+# the daily gold price kept inheriting the same id and had accreted a week of
+# separate reports into a single "story" with 24 headlines. Cap the window so a
+# story stays the event it started as.
+STORY_DAYS = 4
 MIN_HEADLINES = 100  # below this an outlet's loaded-word rate is too noisy to rank on
+
+# Coverage gaps: which outlets could have run a story and didn't.
+#
+# Two things stop this from being nonsense. An outlet only counts as "could have
+# run it" if it was actually filing to that section recently - otherwise a dead
+# feed reads as an editorial choice, and APP (which files no entertainment at
+# all) looks like it is boycotting showbiz. And a gap is only worth showing once
+# enough outlets ran the story that the silence stands out.
+GAP_MIN_SECTION_HEADLINES = 5   # to count as filing to a section at all
+GAP_MIN_COVERAGE = 3            # a story needs this many outlets before absence means anything
 
 # Opinion columns are excluded everywhere: they have no other outlet's version to
 # compare against, and outlets contribute wildly different amounts of opinion to
@@ -128,7 +144,7 @@ def looks_clipped(title):
     return bool(CLIPPED_RE.search(title or ""))
 
 
-def load_stories(conn, days=INDEX_DAYS):
+def load_stories(conn, days=INDEX_DAYS, filing=None):
     rows = conn.execute("""
         SELECT s.story_id, h.id, h.outlet, h.title, h.url, h.section,
                COALESCE(h.published, h.fetched_at) AS ts
@@ -141,8 +157,12 @@ def load_stories(conn, days=INDEX_DAYS):
                              "url": url, "section": section, "ts": ts})
 
     cutoff = (utc_now() - timedelta(days=days)).isoformat()
+    horizon = (utc_now() - timedelta(days=STORY_DAYS)).isoformat()
     result = []
     for sid, items in stories.items():
+        items = [i for i in items if i["ts"] >= horizon]
+        if not items:
+            continue
         outlets = {i["outlet"] for i in items}
         if len(outlets) < MIN_OUTLETS:
             continue
@@ -160,14 +180,19 @@ def load_stories(conn, days=INDEX_DAYS):
         # The opposite end: whoever reached for the most loaded language.
         loudest = max(items, key=lambda i: (len(find_loaded(i["title"])), len(i["title"])))
         desks = Counter(i["section"] for i in items if i["section"])
+        section = desks.most_common(1)[0][0] if desks else ""
+        # Outlets filing to this desk that still did not run the story.
+        could_have = (filing or {}).get(section, set())
+        missing = sorted(could_have - outlets) if len(outlets) >= GAP_MIN_COVERAGE else []
         result.append({
+            "missing": missing,
             "id": sid,
             "title": plain["title"],
             "plain": plain,
             "loudest": loudest,
             "items": items,
             "outlets": len(outlets),
-            "section": desks.most_common(1)[0][0] if desks else "",
+            "section": section,
             "loaded_count": sum(len(find_loaded(i["title"])) for i in items),
             "first_ts": items[0]["ts"],
             "last_ts": last_ts,
@@ -177,6 +202,26 @@ def load_stories(conn, days=INDEX_DAYS):
     result.sort(key=lambda s: s["last_ts"], reverse=True)
     result.sort(key=lambda s: (-s["outlets"], -len(s["items"])))
     return result
+
+
+def outlets_filing_by_section(conn, days=INDEX_DAYS):
+    """
+    {section: {outlets that have been filing to it}} over the window.
+
+    This is the "could have covered it" set. Built per section, because outlets
+    run different desks - holding APP to an entertainment story it was never
+    going to file would be a made-up gap.
+    """
+    since = (utc_now() - timedelta(days=days)).isoformat()
+    filing = defaultdict(set)
+    for section, outlet, n in conn.execute(
+        "SELECT section, outlet, COUNT(*) FROM headlines "
+        "WHERE COALESCE(published, fetched_at) >= ? AND section IS NOT NULL "
+        "GROUP BY section, outlet", (since,)
+    ):
+        if n >= GAP_MIN_SECTION_HEADLINES:
+            filing[section].add(outlet)
+    return filing
 
 
 def load_headlines_since(conn, days):
@@ -420,6 +465,15 @@ mark { background: var(--marker); color: var(--on-accent); padding: 0 .12em; }
                 letter-spacing: -.025em; max-width: 22ch; }
 .storyhead .facts { margin-top: 1rem; font-family: var(--mono); font-size: .6rem;
                     letter-spacing: .1em; text-transform: uppercase; color: var(--soft); }
+/* who could have run the story and didn't */
+.gap { margin-top: 1.4rem; padding: .85rem 1rem; border: 1px solid var(--rule);
+       max-width: 52rem; }
+.gap b { display: block; font-family: var(--mono); font-weight: 400; font-size: .58rem;
+         letter-spacing: .16em; text-transform: uppercase; color: var(--soft); }
+.gap span { display: block; margin-top: .4rem; font-family: var(--serif);
+            font-size: 1.05rem; line-height: 1.3; }
+.gap em { display: block; margin-top: .45rem; font-style: normal; font-family: var(--mono);
+          font-size: .58rem; line-height: 1.6; letter-spacing: .04em; color: var(--soft); }
 
 /* the Off Mute row table - one row per outlet's version of the story */
 .rows { list-style: none; margin: 0; padding: 0; }
@@ -536,6 +590,7 @@ def plural(n, word, many=None):
 def cover_rows(stories, start=1):
     out = []
     for n, s in enumerate(stories, start):
+        gap_note = f'<br>{len(s["missing"])} sat out' if s["missing"] else ""
         kicker = s["section"] or "Story"
         if s["loaded_count"]:
             kicker += f' &middot; {plural(s["loaded_count"], "loaded word")}'
@@ -544,7 +599,8 @@ def cover_rows(stories, start=1):
             f'<div><div class="ct-kicker">{kicker}</div>'
             f'<div class="ct-title"><a href="story/{s["id"]}.html">'
             f'{html.escape(s["title"])}</a></div></div>'
-            f'<div class="ct-meta">{s["outlets"]} outlets<br>{len(s["items"])} headlines</div></li>'
+            f'<div class="ct-meta">{s["outlets"]} outlets<br>{len(s["items"])} headlines'
+            f'{gap_note}</div></li>'
         )
     return "".join(out)
 
@@ -688,6 +744,14 @@ def build_story(s, colours):
     if s["loaded_count"]:
         loaded = f' &middot; {plural(s["loaded_count"], "loaded word")} marked'
 
+    gap = ""
+    if s["missing"]:
+        names = ", ".join(html.escape(o) for o in s["missing"])
+        gap = (f'<div class="gap"><b>Didn&rsquo;t run it</b>'
+               f'<span>{names}</span>'
+               f'<em>Filing to the {html.escape(s["section"] or "same")} desk these two days, '
+               f'but no version of this story.</em></div>')
+
     body = f"""<div class="band-paper"><div class="frame">
   <div class="topbar">
     <a class="home" href="../index.html">&larr; All stories</a>
@@ -700,6 +764,7 @@ def build_story(s, colours):
     <h1>{html.escape(s["title"])}</h1>
     <div class="facts">{plural(s["outlets"], "outlet")} &middot;
     {plural(len(s["items"]), "headline")}{loaded} &middot; updated {fmt_date(s["last_ts"])}</div>
+    {gap}
   </header>
   <ul class="rows">{''.join(rows)}</ul>
   <p class="backline">Every headline links to the original article at that outlet. The story
@@ -748,7 +813,7 @@ def write(path, content):
 
 def main():
     conn = sqlite3.connect(DB_PATH)
-    stories = load_stories(conn)
+    stories = load_stories(conn, filing=outlets_filing_by_section(conn))
     built_at = utc_now().astimezone(timezone(timedelta(hours=5))).strftime("%d %b %Y, %H:%M PKT")
     colours = day_colours()
 
