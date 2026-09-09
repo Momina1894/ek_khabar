@@ -211,5 +211,51 @@ class StoryAssembly(unittest.TestCase):
         self.assertEqual(story["missing"], [])
 
 
+class CoverOrdering(unittest.TestCase):
+    """Newest day first; inside a day, the most widely covered first."""
+
+    def setUp(self):
+        self.conn = sqlite3.connect(":memory:")
+        collector.init_db(self.conn)
+        cluster.init_db(self.conn)
+        now = build.utc_now()
+        # story 1: yesterday, 3 outlets.  story 2: today, 2 outlets.
+        # story 3: today, 3 outlets.  Expected order: 3, 2, 1.
+        plan = [(1, 1, 3), (2, 0, 2), (3, 0, 3)]
+        hid = 0
+        for story_id, days_ago, outlets in plan:
+            ts = (now - __import__("datetime").timedelta(days=days_ago, hours=1)).isoformat()
+            for k in range(outlets):
+                hid += 1
+                self.conn.execute(
+                    "INSERT INTO headlines (outlet,title,url,published,fetched_at,section)"
+                    " VALUES (?,?,?,?,?,'Pakistan')",
+                    ("Outlet {0}".format(k), "Story {0} as told by {1}".format(story_id, k),
+                     "u{0}".format(hid), ts, ts))
+                self.conn.execute(
+                    "INSERT INTO stories (headline_id, story_id, clustered_at)"
+                    " VALUES (?,?,'t0')", (hid, story_id))
+        self.conn.commit()
+
+    def test_newest_day_leads(self):
+        got = build.load_stories(self.conn)
+        newest = build.pkt(got[0]["last_ts"]).date()
+        oldest = build.pkt(got[-1]["last_ts"]).date()
+        self.assertGreater(newest, oldest, "an older day is sorting above a newer one")
+
+    def test_within_a_day_widest_coverage_leads(self):
+        got = build.load_stories(self.conn)
+        today = [s for s in got if build.pkt(s["last_ts"]).date()
+                 == build.pkt(build.utc_now().isoformat()).date()]
+        self.assertEqual([s["outlets"] for s in today], sorted(
+            (s["outlets"] for s in today), reverse=True))
+
+    def test_every_day_change_gets_a_heading(self):
+        got = build.load_stories(self.conn)
+        markup = build.cover_rows(got)
+        days = {build.pkt(s["last_ts"]).date() for s in got}
+        self.assertEqual(markup.count('class="daymark"'), len(days))
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -197,10 +197,12 @@ def load_stories(conn, days=INDEX_DAYS, filing=None):
             "first_ts": items[0]["ts"],
             "last_ts": last_ts,
         })
-    # Two stable passes: newest first, then re-ordered by how widely it was covered.
-    # Stories tied on coverage therefore come out most-recently-updated first.
-    result.sort(key=lambda s: s["last_ts"], reverse=True)
+    # Newest day first, and inside a day the most widely covered first. Ranking
+    # purely by coverage put a story from the 7th above one from the 8th, which
+    # just read as broken; ranking purely by clock time would bury an eight-outlet
+    # story under whatever happened to land twenty minutes ago.
     result.sort(key=lambda s: (-s["outlets"], -len(s["items"])))
+    result.sort(key=lambda s: pkt(s["last_ts"]).date(), reverse=True)
     return result
 
 
@@ -429,13 +431,21 @@ mark { background: var(--marker); color: var(--on-accent); padding: 0 .12em; }
 /* the cover's story list */
 .cover-list { list-style: none; margin: 0; padding: 0; }
 .cover-list li { position: relative; border-top: 1px solid var(--hair);
-                 display: grid; grid-template-columns: 4.2rem 1fr 7.5rem;
+                 display: grid; grid-template-columns: 4.2rem 1fr 10rem;
                  gap: 1.2rem; align-items: baseline; padding: .95rem .4rem;
                  transition: background .12s linear, color .12s linear; }
 .cover-list li:first-child { border-top: 0; }
 .cover-list li:hover, .cover-list li:focus-within { background: var(--ink); color: var(--paper); }
 .cover-list li:hover .ct-kicker, .cover-list li:hover .ct-meta,
 .cover-list li:focus-within .ct-kicker, .cover-list li:focus-within .ct-meta { opacity: 1; }
+.cover-list .daymark { display: flex; align-items: baseline; justify-content: space-between;
+                      gap: 1rem; padding: 1.6rem .4rem .5rem; border-top: 1px solid var(--ink); }
+.cover-list li.daymark:first-child { padding-top: 0; border-top: 0; }
+.cover-list .daymark:hover { background: none; color: inherit; }
+.cover-list .daymark span { font-family: var(--sans); font-weight: 700; font-size: .95rem;
+                            letter-spacing: -.01em; }
+.cover-list .daymark em { font-family: var(--mono); font-style: normal; font-size: .58rem;
+                          letter-spacing: .12em; opacity: .7; }
 .cover-list .ct-no { font-family: var(--mono); font-size: .58rem; letter-spacing: .1em; }
 .cover-list .ct-kicker { font-family: var(--mono); font-size: .55rem; letter-spacing: .14em;
                          text-transform: uppercase; opacity: .72; margin-bottom: .2rem; }
@@ -562,18 +572,31 @@ document.addEventListener("DOMContentLoaded", ekLabelTheme);
 
 
 
+PKT = timezone(timedelta(hours=5))
+
+
+def pkt(ts):
+    """A timestamp in Pakistan time - the clock the readers are on."""
+    return datetime.fromisoformat(ts).astimezone(PKT)
+
+
 def fmt_time(ts):
     try:
-        dt = datetime.fromisoformat(ts).astimezone(timezone(timedelta(hours=5)))  # PKT
-        return dt.strftime("%d %b, %H:%M")
+        return pkt(ts).strftime("%d %b, %H:%M")
+    except Exception:
+        return ""
+
+
+def fmt_clock(ts):
+    try:
+        return pkt(ts).strftime("%H:%M")
     except Exception:
         return ""
 
 
 def fmt_date(ts):
     try:
-        dt = datetime.fromisoformat(ts).astimezone(timezone(timedelta(hours=5)))
-        return dt.strftime("%d %b %Y")
+        return pkt(ts).strftime("%d %b %Y")
     except Exception:
         return ""
 
@@ -587,19 +610,46 @@ def plural(n, word, many=None):
 
 # ---------------------------------------------------------------- the cover
 
+def day_heading(ts):
+    """'Today' / 'Yesterday' / '07 September' for a story's most recent headline."""
+    day = pkt(ts).date()
+    today = pkt(utc_now().isoformat()).date()
+    if day == today:
+        return "Today"
+    if (today - day).days == 1:
+        return "Yesterday"
+    return pkt(ts).strftime("%d %B").lstrip("0")
+
+
 def cover_rows(stories, start=1):
-    out = []
+    """
+    The list, newest day first, with a heading at each date change.
+
+    Grouping by day rather than sorting purely by clock time keeps the ranking
+    inside a day meaningful - a story eight outlets ran is worth more attention
+    than one two outlets ran twenty minutes ago - while still putting the fresh
+    news at the top, which a flat coverage ranking did not.
+    """
+    out, current_day = [], None
     for n, s in enumerate(stories, start):
-        gap_note = f'<br>{len(s["missing"])} sat out' if s["missing"] else ""
-        kicker = s["section"] or "Story"
+        day = pkt(s["last_ts"]).date()
+        if day != current_day:
+            current_day = day
+            out.append(f'<li class="daymark"><span>{day_heading(s["last_ts"])}</span>'
+                       f'<em>{pkt(s["last_ts"]).strftime("%d.%m.%Y")}</em></li>')
+
+        # Time leads the kicker: it sits right beside the headline, which is where
+        # the eye already is, and keeps the right-hand meta down to two lines.
+        kicker = f'{fmt_clock(s["last_ts"])} &middot; {s["section"] or "Story"}'
         if s["loaded_count"]:
             kicker += f' &middot; {plural(s["loaded_count"], "loaded word")}'
+        gap_note = f'<br>{len(s["missing"])} sat out' if s["missing"] else ""
         out.append(
             f'<li><div class="ct-no">{n:02d}</div>'
             f'<div><div class="ct-kicker">{kicker}</div>'
             f'<div class="ct-title"><a href="story/{s["id"]}.html">'
             f'{html.escape(s["title"])}</a></div></div>'
-            f'<div class="ct-meta">{s["outlets"]} outlets<br>{len(s["items"])} headlines'
+            f'<div class="ct-meta">{s["outlets"]} outlets, {len(s["items"])} headlines'
             f'{gap_note}</div></li>'
         )
     return "".join(out)
